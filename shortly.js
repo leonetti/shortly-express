@@ -69,7 +69,7 @@ app.post('/signup', function(req, res) {
     } else {
         var user = new User({
           username: req.body.username, 
-          pssword: req.body.password,
+          password: req.body.password,
         });
 
         user.save().then(function(newUser) {
@@ -79,8 +79,6 @@ app.post('/signup', function(req, res) {
     }
   });
 });
-
-
 
 
 app.get('/users',
@@ -90,31 +88,6 @@ function(req, res) {
   })
 });
 
-app.post('/users', 
-function(req, res) {
-  var username = req.body.username;
-  var password = req.body.password;
-  if (!username) {
-    console.log('Not a valid username: ', username);
-    return res.send(404);
-  } 
-
-  new User({ username: username }).fetch().then(function(found) {
-    if (found) {
-      res.send(200, found.attributes);
-    } else {
-        var user = new User({
-          username: username, 
-          pssword: password,
-        });
-
-        user.save().then(function(newUser) {
-          Users.add(newUser);
-          res.send(200, newUser);
-        });
-    }
-  });
-});
 
 app.get('/links', 
 function(req, res) {

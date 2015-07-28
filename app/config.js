@@ -19,9 +19,9 @@ db.knex.schema.hasTable('users').then(function(exists) {
       user.increments('id').primary();
       user.string('username', 30);
       user.string('password', 255);
-      user.string('salt', 255);
+      
     }).then(function (table) {
-      console.log('Created Table', table);
+      console.log('Created Table USERS', table);
     });
   }
 });
@@ -38,7 +38,7 @@ db.knex.schema.hasTable('urls').then(function(exists) {
       link.timestamps();
       // link.integer('user_id').references('users.id');
     }).then(function (table) {
-      console.log('Created Table', table);
+      console.log('Created Table URLS', table);
     });
   } 
 });
@@ -52,7 +52,7 @@ db.knex.schema.hasTable('clicks').then(function(exists) {
       click.integer('link_id');
       click.timestamps();
     }).then(function (table) {
-      console.log('Created Table', table);
+      console.log('Created Table CLICKS', table);
     });
   }
 });
