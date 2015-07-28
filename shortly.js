@@ -58,6 +58,8 @@ function(req, res) {
 app.post('/signup', function(req, res) {
   var username = req.body.username;
   var password = req.body.password;
+  var salt = bcrypt.genSaltSync(10);
+  var hash = bcrypt.hashSync(password, salt);
   if (!username) {
     console.log('Not a valid username: ', username);
     return res.send(404);
@@ -69,7 +71,8 @@ app.post('/signup', function(req, res) {
     } else {
         var user = new User({
           username: req.body.username, 
-          password: req.body.password,
+          password: hash,
+          salt: salt,
         });
 
         user.save().then(function(newUser) {
@@ -79,7 +82,7 @@ app.post('/signup', function(req, res) {
     }
   });
 });
-
+ 
 
 app.get('/users',
 function(req, res) {
