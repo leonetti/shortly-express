@@ -11,6 +11,8 @@ var Links = require('./app/collections/links');
 var Link = require('./app/models/link');
 var Click = require('./app/models/click');
 
+var bcrypt = require('bcrypt');
+
 var app = express();
 
 app.set('views', __dirname + '/views');
@@ -33,6 +35,52 @@ function(req, res) {
   res.render('index');
 });
 
+app.get('/login',
+function(req, res) {
+  res.render('login')
+});
+
+app.get('/signup',
+function(req, res) {
+  res.render('signup');
+})
+
+
+
+
+app.get('/users',
+function(req, res) {
+  Users.reset().fetch().then(function(users) {
+    res.send(200, users.models);
+  })
+});
+
+app.post('/users', 
+function(req, res) {
+  var username = req.body.username;
+  var password = req.body.password;
+  if (!username) {
+    console.log('Not a valid username: ', username);
+    return res.send(404);
+  } 
+
+  new User({ username: username }).fetch().then(function(found) {
+    if (found) {
+      res.send(200, found.attributes);
+    } else {
+        var user = new User({
+          username: username, 
+          pssword: password,
+        });
+
+        user.save().then(function(newUser) {
+          Users.add(newUser);
+          res.send(200, newUser);
+        });
+    }
+  });
+});
+
 app.get('/links', 
 function(req, res) {
   Links.reset().fetch().then(function(links) {
@@ -43,11 +91,10 @@ function(req, res) {
 app.post('/links', 
 function(req, res) {
   var uri = req.body.url;
-
   if (!util.isValidUrl(uri)) {
     console.log('Not a valid url: ', uri);
     return res.send(404);
-  }
+  } 
 
   new Link({ url: uri }).fetch().then(function(found) {
     if (found) {
@@ -58,9 +105,8 @@ function(req, res) {
           console.log('Error reading URL heading: ', err);
           return res.send(404);
         }
-
         var link = new Link({
-          url: uri,
+          url: uri, 
           title: title,
           base_url: req.headers.origin
         });
@@ -108,5 +154,6 @@ app.get('/*', function(req, res) {
   });
 });
 
-console.log('Shortly is listening on 4568');
 app.listen(4568);
+console.log('Shortly is listening on 4568');
+

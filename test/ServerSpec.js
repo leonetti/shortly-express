@@ -9,15 +9,16 @@ var Link = require('../app/models/link');
 
 /************************************************************/
 // Mocha doesn't have a way to designate pending before blocks.
-// Mimic the behavior of xit and xdescribe with xbeforeEach.
+// Mimic the behavior of xit and describe with beforeEach.
 // Remove the 'x' from beforeEach block when working on
 // authentication tests.
 /************************************************************/
-var xbeforeEach = function(){};
+var beforeEach = function(){};
 /************************************************************/
 
 
 describe('', function() {
+  var requestWithSession = request.defaults({jar: true});
 
   beforeEach(function() {
     // log out currently signed in user
@@ -61,9 +62,8 @@ describe('', function() {
 
   describe('Link creation:', function(){
 
-    var requestWithSession = request.defaults({jar: true});
 
-var xbeforeEach = function(){};
+var beforeEach = function(){};
       // create a user that we can then log-in with
       new User({
           'username': 'Phillip',
@@ -83,7 +83,7 @@ var xbeforeEach = function(){};
           done();
         });
       });
-    });
+
 
     it('Only shortens valid urls, returning a 404 - Not found for invalid urls', function(done) {
       var options = {
@@ -142,6 +142,7 @@ var xbeforeEach = function(){};
               if (urls['0'] && urls['0']['title']) {
                 var foundTitle = urls['0']['title'];
               }
+              // console.log(foundTitle);
               expect(foundTitle).to.equal('Funny animal pictures, funny animals, funniest dogs');
               done();
             });
@@ -153,8 +154,8 @@ var xbeforeEach = function(){};
     describe('With previously saved urls:', function(){
 
       var link;
-
-      beforeEach(function(done){
+      var testLink;
+      // beforeEach(function(done){
         // save a link to the database
         link = new Link({
           url: 'http://roflzoo.com/',
@@ -164,8 +165,7 @@ var xbeforeEach = function(){};
         link.save().then(function(){
           done();
         });
-      });
-
+      // });
       it('Returns the same shortened code', function(done) {
         var options = {
           'method': 'POST',
@@ -178,6 +178,7 @@ var xbeforeEach = function(){};
 
         requestWithSession(options, function(error, res, body) {
           var code = res.body.code;
+          
           expect(code).to.equal(link.get('code'));
           done();
         });
@@ -213,7 +214,7 @@ var xbeforeEach = function(){};
 
   }); // 'Link creation'
 
-  xdescribe('Privileged Access:', function(){
+  describe('Privileged Access:', function(){
 
     it('Redirects to login page if a user tries to access the main page and is not signed in', function(done) {
       request('http://127.0.0.1:4568/', function(error, res, body) {
@@ -238,7 +239,7 @@ var xbeforeEach = function(){};
 
   }); // 'Priviledged Access'
 
-  xdescribe('Account Creation:', function(){
+  describe('Account Creation:', function(){
 
     it('Signup creates a user record', function(done) {
       var options = {
@@ -286,7 +287,7 @@ var xbeforeEach = function(){};
 
   }); // 'Account Creation'
 
-  xdescribe('Account Login:', function(){
+  describe('Account Login:', function(){
 
     var requestWithSession = request.defaults({jar: true});
 
