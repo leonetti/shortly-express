@@ -43,11 +43,37 @@ function(req, res) {
   } else {
     res.render('index');
   }
-});
+}); 
 
 app.get('/login',
-function(req, res) {
+function(req, res) { 
   res.render('login')
+});
+ 
+app.post('/login',
+function(req, res) {
+  var username = req.body.username;
+  var password = req.body.password;
+  // query for the username
+  var query = new User({ username: username }).fetch().then(function(found) {
+    if(found) {
+      var salt = found.attributes.salt;
+      var hash = bcrypt.hashSync(password, salt);
+      if(hash === found.attributes.password) {
+        loggedIn = true;
+        res.redirect('index');
+      }  else {
+        res.redirect('login');
+      }
+    } else {
+      res.redirect('login');
+    }
+  }); 
+
+
+  // grab the salt
+  // rehash the password with the salt
+  // check if hashed password 
 });
 
 app.get('/signup',
@@ -74,10 +100,9 @@ app.post('/signup', function(req, res) {
           password: hash,
           salt: salt,
         });
-
         user.save().then(function(newUser) {
           Users.add(newUser);
-          res.send(200, newUser);
+          res.send(200, res.redirect('index'));
         });
     }
   });
