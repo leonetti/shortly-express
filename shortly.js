@@ -42,7 +42,7 @@ function(req, res) {
 
 app.get('/create', 
 function(req, res) {
-  if(!sess) {
+  if(!req.session.username) {
     res.redirect('login');
   } else {
     res.render('index');
@@ -52,23 +52,22 @@ function(req, res) {
 app.get('/login',
 function(req, res) { 
   req.session.destroy(function(err) {
-  if(err) {
-    throw err;
-  }
-});
+    if(err) {
+      throw err;
+    }
+  });
   res.render('login')
 });
  
 app.post('/login',
 function(req, res) {
-  sess = req.session;
-  sess.username = req.body.username;
-  sess.password = req.body.password;
+  req.session.username = req.body.username;
+  req.session.password = req.body.password;
   // query for the username
-  var query = new User({ username: sess.username }).fetch().then(function(found) {
+  var query = new User({ username: req.session.username }).fetch().then(function(found) {
     if(found) {
       var salt = found.attributes.salt;
-      var hash = bcrypt.hashSync(sess.password, salt);
+      var hash = bcrypt.hashSync(req.session.password, salt);
       if(hash === found.attributes.password) {
         res.redirect('index');
       }  else {
@@ -111,7 +110,7 @@ app.post('/signup', function(req, res) {
         });
         user.save().then(function(newUser) {
           Users.add(newUser);
-          res.send(200, res.redirect('login'));
+          res.send(200, res.redirect('index'));
         });
     }
   });
@@ -128,8 +127,7 @@ function(req, res) {
 
 app.get('/links', 
 function(req, res) {
-  if(!sess) {
-    sess = null;
+  if(!req.session.username) {
     res.redirect('login');
   } else {
     Links.reset().fetch().then(function(links) {
